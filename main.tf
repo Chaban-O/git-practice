@@ -9,6 +9,23 @@ resource "aws_key_pair" "deployer" {
   public_key = file("~/.ssh/id_rsa.pub") # Вкажіть шлях до вашого публічного SSH ключа
 }
 
+# Генерація випадкового пароля
+resource "random_password" "my_random_password" {
+  length  = 16
+  special = true
+}
+
+# Додавання секрету в AWS Secret Manager
+resource "aws_secretsmanager_secret" "my_test_secret" {
+  name = "my-test-secret"
+}
+
+# Збереження пароля в AWS Secret Manager
+resource "aws_secretsmanager_secret_version" "my_secret_version" {
+  secret_id     = aws_secretsmanager_secret.my_test_secret.id
+  secret_string = random_password.my_random_password.result
+}
+
 # Створюємо Security Group з необхідними правилами
 resource "aws_security_group" "allow_ssh_http_https" {
   name        = "allow_ssh_http_https"
@@ -88,6 +105,15 @@ resource "aws_instance" "web" {
   associate_public_ip_address = true
 }
 
+# Отримуємо поточну інформацію про акаунт AWS
+data "aws_caller_identity" "current" {}
+
+
 output "instance_public_ip" {
   value = aws_instance.web.public_ip
 }
+
+output "aws_account_name" {
+  value = data.aws_caller_identity.current.account_id
+}
+
