@@ -1,6 +1,6 @@
 # Вказуємо провайдер і регіон AWS
 provider "aws" {
-  region = "us-east-1" # Замініть на ваш регіон
+  region = var.aws_region
 }
 
 # Додаємо ваш SSH ключ
@@ -35,7 +35,7 @@ resource "aws_security_group" "allow_ssh_http_https" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["79.110.128.251/32"] # Вкажіть вашу IP адресу
+    cidr_blocks = ["79.110.128.238/32"] # Вкажіть вашу IP адресу
   }
 
   ingress {
@@ -69,15 +69,14 @@ resource "aws_instance" "web" {
   key_name               = aws_key_pair.deployer.key_name
   vpc_security_group_ids = [aws_security_group.allow_ssh_http_https.id]
 
-
   # Додаємо тег для ідентифікації
   tags = {
-    Name = "MyTerraformInstance"
+    Name = var.instance_tags
   }
 
   # Вказуємо параметри для EBS
   root_block_device {
-    volume_size = 10
+    volume_size = var.ebs_size
   }
 
   # Додаємо Provisioner для встановлення Docker та Docker Compose
@@ -89,31 +88,15 @@ resource "aws_instance" "web" {
     }
 
   provisioner "remote-exec" {
-    inline = [
-      "sudo apt-get update",
-      "sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common",
-      "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg",
-      "echo 'deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable' | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null",
-      "sudo apt-get update",
-      "sudo apt-get install -y docker-ce docker-ce-cli containerd.io",
-      "sudo curl -L \"https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose",
-      "sudo chmod +x /usr/local/bin/docker-compose",
-    ]
+    inline = flatten([
+      var.docker_install,
+      var.docker_compose_install
+    ])
   }
 
   # Додаємо публічну IP адресу
   associate_public_ip_address = true
 }
 
-# Отримуємо поточну інформацію про акаунт AWS
+# Отримуємо поточну інформацію про акаунт AWS, account id
 data "aws_caller_identity" "current" {}
-
-
-output "instance_public_ip" {
-  value = aws_instance.web.public_ip
-}
-
-output "aws_account_name" {
-  value = data.aws_caller_identity.current.account_id
-}
-
