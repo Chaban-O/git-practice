@@ -13,8 +13,8 @@ variable "aws_region" {
 
 variable "instance_tags" {
   description = "Instance tags"
-  type = string
-  default = "MyTerraformInstance"
+  type = map(string)
+  default = {}
 }
 
 variable "ebs_size" {
