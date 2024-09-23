@@ -11,16 +11,14 @@ variable "aws_region" {
   default = "us-east-1" # Замініть на ваш регіон
 }
 
-variable "instance_tags" {
-  description = "Instance tags"
-  type = map(string)
-  default = {}
-}
-
 variable "ebs_size" {
   description = "EBS volume size"
   type = number
   default = 10
+}
+
+locals {
+  instance_tag = "MyTerraformInstance"
 }
 
 variable "docker_install" {

@@ -63,10 +63,9 @@ resource "aws_instance" "web" {
   vpc_security_group_ids = [aws_security_group.allow_ssh_http_https.id]
 
   # Додаємо тег для ідентифікації
-  tags = merge(
-    {"name" = "MyTerraformInstance"},
-    var.instance_tags
-  )
+  tags = {
+    Name = local.instance_tag
+  }
 
   # Вказуємо параметри для EBS
   root_block_device {
