@@ -80,11 +80,22 @@ resource "aws_instance" "web" {
       host        = self.public_ip
     }
 
+#   provisioner "remote-exec" {
+#     inline = flatten([
+#       var.docker_install,
+#       var.docker_compose_install
+#     ])
+#   }
+
+  provisioner "file" {
+    source = "install_docker_package.sh"
+    destination = "stage/install_docker_package.sh"
+  }
+
   provisioner "remote-exec" {
-    inline = flatten([
-      var.docker_install,
-      var.docker_compose_install
-    ])
+    inline = [
+      "bash stage/install_docker_package.sh"
+    ]
   }
 
   # Додаємо публічну IP адресу
