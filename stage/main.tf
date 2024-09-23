@@ -17,7 +17,7 @@ resource "random_password" "my_random_password" {
 
 # Додавання секрету в AWS Secret Manager
 resource "aws_secretsmanager_secret" "my_test_secret" {
-  name = "my-test-secret"
+  name = "my-test-secret-key-v2"
 }
 
 # Збереження пароля в AWS Secret Manager
