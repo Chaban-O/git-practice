@@ -80,21 +80,14 @@ resource "aws_instance" "web" {
       host        = self.public_ip
     }
 
-#   provisioner "remote-exec" {
-#     inline = flatten([
-#       var.docker_install,
-#       var.docker_compose_install
-#     ])
-#   }
-
   provisioner "file" {
-    source = "install_docker_package.sh"
-    destination = "stage/install_docker_package.sh"
+    source = "/home/chaban/PycharmProjects/git-practice/stage/install_docker_package.sh"
+    destination = "/home/ubuntu/install_docker_package.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "bash stage/install_docker_package.sh"
+      "bash /home/ubuntu/install_docker_package.sh"
     ]
   }
 
