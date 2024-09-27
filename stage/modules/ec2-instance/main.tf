@@ -49,7 +49,7 @@ resource "aws_instance" "web" {
 
     SECRET_VALUE=$(aws secretsmanager get-secret-value --secret-id ${var.secret_id} --query SecretString --output text --region ${var.aws_region})
 
-    echo "SECRET=$SECRET_VALUE" >> /home/ubuntu.env
+    echo "SECRET=$SECRET_VALUE" >> /home/ubuntu/.env
   EOF
 
   # Додаємо публічну IP адресу
