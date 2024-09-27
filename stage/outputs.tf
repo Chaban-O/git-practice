@@ -9,3 +9,11 @@ output "aws_account_name_manual" {
 output "instance_public_ip" {
   value = module.ec2_instance.instance_public_ip
 }
+
+output "secret_name" {
+  value = module.secrets.secret_name
+}
+
+output "secret_id" {
+  value = module.secrets.secret_id
+}
