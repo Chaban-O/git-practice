@@ -6,7 +6,6 @@ sudo apt-get update -y
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-#UBUNTU_CODENAME=$(lsb_release -cs) && sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $UBUNTU_CODENAME stable\" -y
 UBUNTU_CODENAME=$(lsb_release -cs)
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $UBUNTU_CODENAME stable" -y
 

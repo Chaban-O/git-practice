@@ -28,11 +28,6 @@ variable "ebs_size" {
   type = number
 }
 
-variable "instance_profile_arn" {
-  type        = string
-  description = "IAM Instance profile ARN"
-}
-
 variable "secret_id" {
   description = "Name of the secret id"
   type = string
@@ -41,4 +36,9 @@ variable "secret_id" {
 variable "aws_region" {
   description = "name of the AWS region"
   type = string
+}
+
+variable "instance_profile_name" {
+  type        = string
+  description = "IAM Instance Profile name"
 }

@@ -12,7 +12,7 @@ resource "aws_instance" "web" {
   }
 
   # Встановлює для EC2-інстансу IAM роль через Instance Profile.
-  iam_instance_profile = var.instance_profile_arn
+  iam_instance_profile = var.instance_profile_name
 
   # Вказуємо параметри для EBS
   root_block_device {
@@ -41,10 +41,15 @@ resource "aws_instance" "web" {
   user_data = <<-EOF
     #!/bin/bash
     set -ex
-    sudo apt-get install -y aws-cli
+    sudo apt install unzip curl -y
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    sudo ./aws/install
+    echo "aws --version"
 
     SECRET_VALUE=$(aws secretsmanager get-secret-value --secret-id ${var.secret_id} --query SecretString --output text --region ${var.aws_region})
-    echo "SECRET=$SECRET_VALUE" >> /path/to/your/.env
+
+    echo "SECRET=$SECRET_VALUE" >> /home/ubuntu.env
   EOF
 
   # Додаємо публічну IP адресу

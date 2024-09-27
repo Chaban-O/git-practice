@@ -1,7 +1,13 @@
+###Пояснення###
+#aws_iam_role: Створює роль, яку EC2 інстанс може "асоціювати" для доступу до AWS ресурсів.
+#aws_iam_policy: Створює політику, яка дозволяє отримувати секрети з Secret Manager.
+#aws_iam_role_policy_attachment: Прикріплює політику до ролі.
+#aws_iam_instance_profile: Створює instance profile, необхідний для прикріплення ролі до EC2 інстансу.
+
 # Створення IAM ролі для екземпляра EC2
 # Тут створюється IAM роль для EC2. Використовується політика AssumeRole, яка дозволяє EC2 інстансу "асоціювати" цю IAM роль для доступу до AWS ресурсів
 resource "aws_iam_role" "ec2_role" {
-  name = var.role_name
+  name = var.instance_profile_name
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -17,7 +23,7 @@ resource "aws_iam_role" "ec2_role" {
 
 # Додаємо політику, яка дозволяє EC2 інстансу отримувати значення секретів з Secrets Manager.
 resource "aws_iam_policy" "secret_manager_policy" {
-  name = "secret-manager-access"
+  name = "${var.instance_profile_name}-secret-manager-access"
   description = "Policy to allow access to Secret Manager"
 
   policy = jsonencode({
@@ -34,12 +40,12 @@ resource "aws_iam_policy" "secret_manager_policy" {
 
 # Прикріплюємо створену політику до нашої ролі.
 resource "aws_iam_role_policy_attachment" "attach_secret_policy" {
-  policy_arn = aws_iam_role.ec2_role.arn
-  role       = aws_iam_policy.secret_manager_policy.name
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = aws_iam_policy.secret_manager_policy.arn
 }
 
 # Для того, щоб EC2 інстанс міг використовувати IAM роль, створюємо Instance Profile і асоціюємо його з роллю.
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = "${var.role_name}-instance-profile"
+  name = "${var.instance_profile_name}-instance-profile"
   role = aws_iam_role.ec2_role.name
 }
