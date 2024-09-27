@@ -11,6 +11,9 @@ resource "aws_instance" "web" {
     Name = var.instance_name
   }
 
+  # Встановлює для EC2-інстансу IAM роль через Instance Profile.
+  iam_instance_profile = var.instance_profile_arn
+
   # Вказуємо параметри для EBS
   root_block_device {
     volume_size = var.ebs_size
@@ -34,6 +37,15 @@ resource "aws_instance" "web" {
       "bash /home/ubuntu/install_docker_package.sh"
     ]
   }
+
+  user_data = <<-EOF
+    #!/bin/bash
+    set -ex
+    sudo apt-get install -y aws-cli
+
+    SECRET_VALUE=$(aws secretsmanager get-secret-value --secret-id ${var.secret_id} --query SecretString --output text --region ${var.aws_region})
+    echo "SECRET=$SECRET_VALUE" >> /path/to/your/.env
+  EOF
 
   # Додаємо публічну IP адресу
   associate_public_ip_address = true

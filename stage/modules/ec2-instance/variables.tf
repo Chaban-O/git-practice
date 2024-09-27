@@ -27,3 +27,18 @@ variable "ebs_size" {
   description = "EBS volume size"
   type = number
 }
+
+variable "instance_profile_arn" {
+  type        = string
+  description = "IAM Instance profile ARN"
+}
+
+variable "secret_id" {
+  description = "Name of the secret id"
+  type = string
+}
+
+variable "aws_region" {
+  description = "name of the AWS region"
+  type = string
+}
