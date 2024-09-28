@@ -21,11 +21,6 @@ variable "ssh_username" {
   default = "ubuntu"
 }
 
-variable "ssh_private_key_file" {
-  type = string
-  default = "~/.ssh/id_rsa"
-}
-
 variable "instance_type" {
   default = "t2.micro"
 }
@@ -46,7 +41,6 @@ source "amazon-ebs" "example" {
   source_ami                  = var.ami_name
   instance_type               = var.instance_type
   ssh_username                = var.ssh_username
-  ssh_private_key_file        = var.ssh_private_key_file
   ami_name                    = "packer-base-{{timestamp}}"
   associate_public_ip_address = true
 
@@ -61,19 +55,6 @@ source "amazon-ebs" "example" {
 
 build {
   sources = ["source.amazon-ebs.example"]
-
-  provisioner "file" {
-    source = "/home/chaban/.ssh/id_rsa.pub"
-    destination = "/home/${var.ssh_username}/.ssh/id_rsa.pub"
-  }
-
-  provisioner "shell" {
-    inline = [
-      "cat /home/${var.ssh_username}/.ssh/id_rsa.pub >> /home/${var.ssh_username}/.ssh/authorized_keys", // Додає публічний ключ до authorized_keys
-      "chmod 600 /home/${var.ssh_username}/.ssh/authorized_keys", // Встановлює права доступу
-      "chmod 600 /home/${var.ssh_username}/.ssh/id_rsa.pub" // Встановлює права доступу для публічного ключа
-    ]
-  }
 
   provisioner "file" {
     source = "/home/chaban/PycharmProjects/git-practice/stage/scripts/install-nginx.sh"
