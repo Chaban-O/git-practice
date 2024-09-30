@@ -4,7 +4,7 @@
 variable "ssh_cidr" {
   description = "CIDR block for ssh access"
   type = list(string)
-  default = ["37.73.36.28/32"] # Замість цього значення можна задати список IP-адрес
+  default = ["79.110.128.243/32"] # Замість цього значення можна задати список IP-адрес
 }
 
 variable "http_cidr" {
