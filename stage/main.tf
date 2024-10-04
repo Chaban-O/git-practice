@@ -12,7 +12,7 @@ resource "aws_key_pair" "deployer" {
 # Виклик модуля secrets
 module "secrets" {
   source = "./modules/secrets"
-  secret_name = "my-test-secret-key-v9"
+  secret_name = "my-test-secret-key-v19"
   password_length = 16
   recovery_window_in_days = 7
 }

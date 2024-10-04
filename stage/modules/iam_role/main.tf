@@ -38,10 +38,36 @@ resource "aws_iam_policy" "secret_manager_policy" {
   })
 }
 
-# Прикріплюємо створену політику до нашої ролі.
+#Створюємо cloudwatch політику
+resource "aws_iam_policy" "cloudwatch_policy" {
+  name = "${var.instance_profile_name}-cloudwatch-policy"
+  description = "Policy to allow EC2 to publish CloudWatch metrics"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Action = [
+        "ec2:DescribeInstances",
+        "cloudwatch:PutMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "ec2:DescribeTags"
+      ],
+      Resource = "*"
+    }]
+  })
+}
+
+# Прикріплення політики для доступу до Secrets Manager до ролі
 resource "aws_iam_role_policy_attachment" "attach_secret_policy" {
-  role       = aws_iam_role.ec2_role.name
   policy_arn = aws_iam_policy.secret_manager_policy.arn
+  role       = aws_iam_role.ec2_role.name
+}
+
+# Прикріплення політики для доступу до EC2 до ролі
+resource "aws_iam_role_policy_attachment" "attach_cloudwatch_policy" {
+  policy_arn = aws_iam_policy.cloudwatch_policy.arn
+  role       = aws_iam_role.ec2_role.name
 }
 
 # Для того, щоб EC2 інстанс міг використовувати IAM роль, створюємо Instance Profile і асоціюємо його з роллю.
