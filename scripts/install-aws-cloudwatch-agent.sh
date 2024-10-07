@@ -1,31 +1,29 @@
 #!/bin/bash
-
 set -ex
-# Отримання Instance ID з параметра
-INSTANCE_ID="$1"
 
-# Оновлення системи
-sudo apt-get update -y
-sudo apt-get install -y amazon-cloudwatch-agent
+sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+sudo dpkg -i amazon-cloudwatch-agent.deb
+sudo apt-get -f -y install
+sudo systemctl stop amazon-cloudwatch-agent
+sleep 10
 
-# Створення конфігураційного файлу для CloudWatch Agent
-sudo tee /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json > /dev/null <<EOT
-{
-  "metrics": {
-    "append_dimensions": {
-      "InstanceId": "$INSTANCE_ID"
+echo "{
+  \"metrics\": {
+    \"append_dimensions\": {
+      \"InstanceId\": \"$(curl -s http://169.254.169.254/latest/meta-data/instance-id)\"
     },
-    "metrics_collected": {
-      "mem": {
-        "measurement": [
-          "mem_used_percent"
+    \"metrics_collected\": {
+      \"mem\": {
+        \"measurement\": [
+          \"mem_used_percent\"
         ],
-        "metrics_collection_interval": 60
+        \"metrics_collection_interval\": 5
       }
     }
   }
-}
-EOT
+}" | sudo tee /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
 
-# Запуск агента CloudWatch
-sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start
+sleep 5
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+sleep 5
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json

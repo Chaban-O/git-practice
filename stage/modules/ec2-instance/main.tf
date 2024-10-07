@@ -32,24 +32,32 @@ resource "aws_instance" "web" {
     destination = "/home/ubuntu/install_docker_package.sh"
   }
 
+  provisioner "file" {
+    source = "/home/chaban/PycharmProjects/git-practice/scripts/install-aws-cli.sh"
+    destination = "/home/ubuntu/install-aws-cli.sh"
+  }
+
+  provisioner "file" {
+    source = "/home/chaban/PycharmProjects/git-practice/scripts/install-aws-cloudwatch-agent.sh"
+    destination = "/home/ubuntu/install-aws-cloudwatch-agent.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
-      "bash /home/ubuntu/install_docker_package.sh"
+      "bash /home/ubuntu/install_docker_package.sh",
+      "chmod +x /home/ubuntu/install-aws-cli.sh",
+      "bash /home/ubuntu/install-aws-cli.sh \"${var.secret_id}\" \"${var.aws_region}\"",
+      "chmod +x /home/ubuntu/install-aws-cloudwatch-agent.sh",
+      "bash /home/ubuntu/install-aws-cloudwatch-agent.sh"
     ]
   }
 
   user_data = <<-EOF
     #!/bin/bash
     set -ex
-    sudo apt install unzip curl -y
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-    unzip awscliv2.zip
-    sudo ./aws/install
-    echo "aws --version"
 
-    SECRET_VALUE=$(aws secretsmanager get-secret-value --secret-id ${var.secret_id} --query SecretString --output text --region ${var.aws_region})
-
-    echo "SECRET=$SECRET_VALUE" >> /home/ubuntu/.env
+    SECRET_ID="${var.secret_id}"
+    AWS_REGION="${var.aws_region}"
   EOF
 
   # Додаємо публічну IP адресу
