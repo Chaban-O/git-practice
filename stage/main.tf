@@ -28,6 +28,19 @@ module "iam_role" {
   instance_profile_name = "ec2_secret_manager_role"
 }
 
+# Виклик модуля Application Load Balancer
+# module "alb" {
+#   source = "./modules/alb"
+#   instance_ids = [module.ec2_instance.instance_id]
+#   lb_name           = "test-alb"
+#   security_group_ids = [module.aws_security_group.allow_ssh_http_https]
+#   subnet_ids = []
+#   target_group_name = "test-tg"
+#   target_group_port = 80
+#   vpc_id            = data.aws_vpc.default.id
+#   target_group_protocol = ["HTTP"]
+# }
+
 # Виклик EC2 модуля
 module "ec2_instance" {
   source = "./modules/ec2-instance"
