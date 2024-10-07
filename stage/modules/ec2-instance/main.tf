@@ -28,7 +28,7 @@ resource "aws_instance" "web" {
     }
 
   provisioner "file" {
-    source = "/home/chaban/PycharmProjects/git-practice/stage/scripts/install_docker_package.sh"
+    source = "/home/chaban/PycharmProjects/git-practice/scripts/install_docker_package.sh"
     destination = "/home/ubuntu/install_docker_package.sh"
   }
 

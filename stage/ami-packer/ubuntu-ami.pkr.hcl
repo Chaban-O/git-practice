@@ -57,7 +57,7 @@ build {
   sources = ["source.amazon-ebs.example"]
 
   provisioner "file" {
-    source = "/home/chaban/PycharmProjects/git-practice/stage/scripts/install-nginx.sh"
+    source = "/home/chaban/PycharmProjects/git-practice/scripts/install-nginx.sh"
     destination = "/home/ubuntu/install-nginx.sh"
   }
 
