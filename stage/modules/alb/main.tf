@@ -35,5 +35,5 @@ resource "aws_lb_target_group" "target-group" {
 # Підключення Target Group до AutoScaling Group
 resource "aws_autoscaling_attachment" "asg_attachment" {
     autoscaling_group_name = var.autoscaling_group
-    lb_target_group_arn = aws_lb_target_group.target-group.arn
+    lb_target_group_arn    = aws_lb_target_group.target-group.arn
 }
