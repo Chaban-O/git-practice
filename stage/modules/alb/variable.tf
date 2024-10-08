@@ -18,7 +18,7 @@ variable "target_group_name" {
     type        = string
 }
 
-variable "target_group_port" {
+variable "health_check_port" {
     description = "Port for the target group"
     type        = number
 }
@@ -28,12 +28,12 @@ variable "vpc_id" {
     type        = string
 }
 
-variable "instance_ids" {
-    description = "List of EC2 instance IDs to attach to the target group"
-    type        = list(string)
+variable "target_group_protocol" {
+    description = "Target protocols"
+    type = string
 }
 
-variable "target_group_protocol" {
-    description = "List of target protocols"
-    type = list(string)
+variable "autoscaling_group" {
+    description = "autoscaling_group name"
+    type = string
 }

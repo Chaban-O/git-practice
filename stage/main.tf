@@ -9,6 +9,43 @@ resource "aws_key_pair" "deployer" {
   public_key = file("~/.ssh/id_rsa.pub") # Вкажіть шлях до вашого публічного SSH ключа
 }
 
+# Імпортуємо існуючий в AWS VPC ()
+resource "aws_vpc" "my_vpc" {
+  tags = {
+    Name = "my-existing-vpc"
+  }
+}
+
+# Імпортуємо існуючу сабнет маску з списку сабнетс
+resource "aws_subnet" "my_subnet_1" {
+  vpc_id            = "vpc-0f0cac06dbc6b8429"
+  cidr_block        = "172.31.16.0/20"  # Можете використовувати будь-який CIDR блок спочатку
+  availability_zone = "us-east-1d"
+  tags = {
+    Name = "My-Subnet-1"
+  }
+}
+
+# Імпортуємо існуючу сабнет маску з списку сабнетс
+resource "aws_subnet" "my_subnet_2" {
+  vpc_id            = "vpc-0f0cac06dbc6b8429"
+  cidr_block        = "172.31.0.0/20"  # Замість цього параметру будуть взяті реальні значення при імпорті
+  availability_zone = "us-east-1b"
+  tags = {
+    Name = "My-Subnet-2"
+  }
+}
+
+# Імпортуємо існуючу сабнет маску з списку сабнетс
+resource "aws_subnet" "my_subnet_3" {
+  vpc_id            = "vpc-0f0cac06dbc6b8429"
+  cidr_block        = "172.31.64.0/20"
+  availability_zone = "us-east-1f"
+  tags = {
+    Name = "My-Subnet-3"
+  }
+}
+
 # Виклик модуля secrets
 module "secrets" {
   source = "./modules/secrets"
@@ -29,17 +66,21 @@ module "iam_role" {
 }
 
 # Виклик модуля Application Load Balancer
-# module "alb" {
-#   source = "./modules/alb"
-#   instance_ids = [module.ec2_instance.instance_id]
-#   lb_name           = "test-alb"
-#   security_group_ids = [module.aws_security_group.allow_ssh_http_https]
-#   subnet_ids = []
-#   target_group_name = "test-tg"
-#   target_group_port = 80
-#   vpc_id            = data.aws_vpc.default.id
-#   target_group_protocol = ["HTTP"]
-# }
+module "alb" {
+  source = "./modules/alb"
+  lb_name           = "test-alb"
+  security_group_ids = [module.aws_security_group.allow_ssh_http_https]
+  subnet_ids = [
+    aws_subnet.my_subnet_1.id,
+    aws_subnet.my_subnet_2.id,
+    aws_subnet.my_subnet_3.id
+  ]
+  target_group_name = "test-tg"
+  health_check_port = 80
+  vpc_id            = aws_vpc.my_vpc.id
+  target_group_protocol = "HTTP"
+  autoscaling_group = module.autoscaling.asg_name
+}
 
 # Виклик EC2 модуля
 module "ec2_instance" {
