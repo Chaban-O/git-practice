@@ -96,5 +96,22 @@ module "ec2_instance" {
   aws_region = var.aws_region
 }
 
+#Виклик модуля Autoscaling group
+module "autoscaling" {
+  source = "./modules/autoscaling"
+  ami_id = local.ami_name
+  aws_lb_target_group_arn = module.alb.target_group_arn
+  instance_security_group = module.aws_security_group.allow_ssh_http_https
+  instance_type = module.ec2_instance.instance_type
+  subnets = [
+    aws_subnet.my_subnet_1.id,
+    aws_subnet.my_subnet_2.id,
+    aws_subnet.my_subnet_3.id
+  ]
+  desired_capacity = 2
+  max_size = 3
+  min_size = 1
+}
+
 # Отримуємо поточну інформацію про аккаунт AWS, account id
 data "aws_caller_identity" "current" {}
