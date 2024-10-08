@@ -1,6 +1,6 @@
 # Вказуємо провайдер і регіон AWS
 provider "aws" {
-  region = var.aws_region
+  region = "us-east-1"
 }
 
 # Додаємо ваш SSH ключ
@@ -9,7 +9,8 @@ resource "aws_key_pair" "deployer" {
   public_key = file("~/.ssh/id_rsa.pub") # Вкажіть шлях до вашого публічного SSH ключа
 }
 
-# Імпортуємо існуючий в AWS VPC ()
+# Імпортуємо існуючий в AWS VPC (ізольоване віртуальне середовище в хмарі, в якому ви можете запускати ресурси
+# такі як EC2 інстанси, RDS бази даних, та інші сервіси AWS)
 resource "aws_vpc" "my_vpc" {
   tags = {
     Name = "my-existing-vpc"
@@ -17,6 +18,7 @@ resource "aws_vpc" "my_vpc" {
 }
 
 # Імпортуємо існуючу сабнет маску з списку сабнетс
+# terraform import aws_subnet.my_subnet_2 subnet-0fc77fa1b1b2536a9
 resource "aws_subnet" "my_subnet_1" {
   vpc_id            = "vpc-0f0cac06dbc6b8429"
   cidr_block        = "172.31.16.0/20"  # Можете використовувати будь-який CIDR блок спочатку
@@ -97,6 +99,7 @@ module "ec2_instance" {
 }
 
 #Виклик модуля Autoscaling group
+# terraform import module.myapp_db.aws_db_instance.myapp_db your-rds-instance-arn
 module "autoscaling" {
   source = "./modules/autoscaling"
   ami_id = local.ami_name
@@ -111,6 +114,16 @@ module "autoscaling" {
   desired_capacity = 2
   max_size = 3
   min_size = 1
+}
+
+#Виклик RDS модуля
+module "rds_instance" {
+  source = "./modules/rds-instance"
+  allocated_storage = 20
+  db_instance_class = "db.t2.micro"
+  engine_type       = "mysql"
+  rds_db_name       = "myapp-db"
+  vpc_security_group_ids = [module.aws_security_group.allow_ssh_http_https]
 }
 
 # Отримуємо поточну інформацію про аккаунт AWS, account id
