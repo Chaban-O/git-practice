@@ -11,26 +11,31 @@ resource "aws_key_pair" "deployer" {
 
 # Імпортуємо існуючий в AWS VPC (ізольоване віртуальне середовище в хмарі, в якому ви можете запускати ресурси
 # такі як EC2 інстанси, RDS бази даних, та інші сервіси AWS)
+# terraform import aws_vpc.my_vpc vpc-0bbf330c7549826b9
 resource "aws_vpc" "my_vpc" {
+  lifecycle {
+    prevent_destroy = true
+  }
   tags = {
     Name = "my-existing-vpc"
   }
 }
 
 # Імпортуємо існуючу сабнет маску з списку сабнетс
-# terraform import aws_subnet.my_subnet_2 subnet-0fc77fa1b1b2536a9
+# terraform import aws_subnet.my_subnet_1 subnet-0917ae27ff5541e09
 resource "aws_subnet" "my_subnet_1" {
-  vpc_id            = "vpc-0f0cac06dbc6b8429"
-  cidr_block        = "172.31.16.0/20"  # Можете використовувати будь-який CIDR блок спочатку
-  availability_zone = "us-east-1d"
+  vpc_id            = "vpc-0bbf330c7549826b9"
+  cidr_block        = "172.31.80.0/20"  # Можете використовувати будь-який CIDR блок спочатку
+  availability_zone = "us-east-1c"
   tags = {
     Name = "My-Subnet-1"
   }
 }
 
 # Імпортуємо існуючу сабнет маску з списку сабнетс
+# terraform import aws_subnet.my_subnet_2 subnet-0f386bb962e3c2ab3
 resource "aws_subnet" "my_subnet_2" {
-  vpc_id            = "vpc-0f0cac06dbc6b8429"
+  vpc_id            = "vpc-0bbf330c7549826b9"
   cidr_block        = "172.31.0.0/20"  # Замість цього параметру будуть взяті реальні значення при імпорті
   availability_zone = "us-east-1b"
   tags = {
@@ -39,10 +44,11 @@ resource "aws_subnet" "my_subnet_2" {
 }
 
 # Імпортуємо існуючу сабнет маску з списку сабнетс
+# terraform import aws_subnet.my_subnet_3 subnet-03eeb73542ce1ac39
 resource "aws_subnet" "my_subnet_3" {
-  vpc_id            = "vpc-0f0cac06dbc6b8429"
-  cidr_block        = "172.31.64.0/20"
-  availability_zone = "us-east-1f"
+  vpc_id            = "vpc-0bbf330c7549826b9"
+  cidr_block        = "172.31.32.0/20"
+  availability_zone = "us-east-1a"
   tags = {
     Name = "My-Subnet-3"
   }
@@ -51,7 +57,7 @@ resource "aws_subnet" "my_subnet_3" {
 # Виклик модуля secrets
 module "secrets" {
   source = "./modules/secrets"
-  secret_name = "my-test-secret-key-v28"
+  secret_name = "my-test-secret-key-v47"
   password_length = 16
   recovery_window_in_days = 7
 }
@@ -79,7 +85,7 @@ module "alb" {
   ]
   target_group_name = "test-tg"
   health_check_port = 80
-  vpc_id            = aws_vpc.my_vpc.id
+  vpc_id            = ""
   target_group_protocol = "HTTP"
   autoscaling_group = module.autoscaling.asg_name
 }
@@ -99,7 +105,6 @@ module "ec2_instance" {
 }
 
 #Виклик модуля Autoscaling group
-# terraform import module.myapp_db.aws_db_instance.myapp_db your-rds-instance-arn
 module "autoscaling" {
   source = "./modules/autoscaling"
   ami_id = local.ami_name
@@ -117,13 +122,16 @@ module "autoscaling" {
 }
 
 #Виклик RDS модуля
+# terraform import module.rds_instance.aws_db_instance.myapp-db arn:aws:rds:us-east-1:699475951891:db:myapp-db
 module "rds_instance" {
   source = "./modules/rds-instance"
   allocated_storage = 20
-  db_instance_class = "db.t2.micro"
+  db_instance_class = "db.m5d.large"
   engine_type       = "mysql"
-  rds_db_name       = "myapp-db"
+  rds_db_name       = "myappdb"
   vpc_security_group_ids = [module.aws_security_group.allow_ssh_http_https]
+  cluster_identifier = "database1"
+  engine_version = "8.0.35"
 }
 
 # Отримуємо поточну інформацію про аккаунт AWS, account id
