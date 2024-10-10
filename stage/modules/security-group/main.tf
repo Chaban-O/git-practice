@@ -1,7 +1,7 @@
 # Створюємо Security Group з необхідними правилами
 resource "aws_security_group" "allow_ssh_http_https" {
-  name        = "allow_ssh_http_https"
-  description = "Allow SSH, HTTP, and HTTPS traffic"
+  name        = "allow_ssh_http_https_rds"
+  description = "Allow SSH, HTTP, and HTTPS, RDS traffic"
 
   # Динамічно створюємо ingress правила для SSH, HTTP та HTTPS
   dynamic "ingress" {
