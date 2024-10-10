@@ -32,8 +32,27 @@ resource "aws_lb_target_group" "target-group" {
     vpc_id      = var.vpc_id
 }
 
+# Створення ліснера на 80 для перенаправлення вхідного трафіку від ALB до цільової групи
+resource "aws_lb_listener" "alb-listener" {
+    load_balancer_arn = aws_lb.application-lb.arn
+    port = 80
+    protocol = "HTTP"
+    default_action {
+        target_group_arn = aws_lb_target_group.target-group.arn
+        type = "forward"
+    }
+}
+
 # Підключення Target Group до AutoScaling Group
 resource "aws_autoscaling_attachment" "asg_attachment" {
     autoscaling_group_name = var.autoscaling_group
     lb_target_group_arn    = aws_lb_target_group.target-group.arn
+}
+
+# Attaching Target Group to ALB
+resource "aws_lb_target_group_attachment" "ec2_attach" {
+    count = length(var.instance_ids)
+    target_group_arn = aws_lb_target_group.target-group.arn
+    target_id        = var.instance_ids[count.index]
+    port = 80
 }

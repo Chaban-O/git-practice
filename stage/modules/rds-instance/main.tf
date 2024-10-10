@@ -5,7 +5,7 @@ resource "aws_db_instance" "myapp-db" {
   instance_class = var.db_instance_class
   allocated_storage = var.allocated_storage
   username = "admin"
-  password = "dbadmin"
+  password = "adminadmin"
   db_name = var.rds_db_name
   skip_final_snapshot = true
 

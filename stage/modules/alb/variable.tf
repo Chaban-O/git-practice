@@ -37,3 +37,14 @@ variable "autoscaling_group" {
     description = "autoscaling_group name"
     type = string
 }
+
+variable "instance_ids" {
+    description = ""
+    type = list(string)
+}
+
+variable "instance_count" {
+    description = ""
+    type = number
+    default = 1
+}
