@@ -50,11 +50,14 @@ module "alb" {
   subnet_ids = [
     data.aws_subnet.my-subnet-1.id,
     data.aws_subnet.my-subnet-2.id,
-    data.aws_subnet.my-subnet-3.id
+    data.aws_subnet.my-subnet-3.id,
+    data.aws_subnet.my-subnet-4.id,
+    data.aws_subnet.my-subnet-5.id,
+    data.aws_subnet.my-subnet-6.id
   ]
   target_group_name = "test-tg"
   health_check_port = 80
-  vpc_id            = data.aws_vpc.my-existing-vpc.id
+  vpc_id            = data.aws_vpc.default.id
   target_group_protocol = "HTTP"
   autoscaling_group = module.autoscaling.asg_name
   instance_ids = module.ec2_instance.instance_ids
@@ -70,7 +73,10 @@ module "autoscaling" {
   subnets = [
     data.aws_subnet.my-subnet-1.id,
     data.aws_subnet.my-subnet-2.id,
-    data.aws_subnet.my-subnet-3.id
+    data.aws_subnet.my-subnet-3.id,
+    data.aws_subnet.my-subnet-4.id,
+    data.aws_subnet.my-subnet-5.id,
+    data.aws_subnet.my-subnet-6.id
   ]
   desired_capacity = 2
   max_size = 3

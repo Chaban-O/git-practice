@@ -1,16 +1,19 @@
+# Імпортуємо ami packer profile
+data "aws_ami" "my_packer_ami" {
+  most_recent = true
+  owners = ["self"]
+}
+
 # Імпортуємо vpc, знаходячи його на aws по назві
-data "aws_vpc" "my-existing-vpc" {
-  filter {
-    name = "tag:Name"
-    values = ["my-existing-vpc"]
-  }
+data "aws_vpc" "default" {
+  default = true
 }
 
 # Імпортуємо subnet, знаходячи її на aws по id
 data "aws_subnet" "my-subnet-1" {
   filter {
     name = "subnet-id"
-    values = ["subnet-0917ae27ff5541e09"]
+    values = ["subnet-0a3634e97be8618b5"]
   }
 }
 
@@ -18,7 +21,7 @@ data "aws_subnet" "my-subnet-1" {
 data "aws_subnet" "my-subnet-2" {
   filter {
     name = "subnet-id"
-    values = ["subnet-0f386bb962e3c2ab3"]
+    values = ["subnet-0c01848d938e6913e"]
   }
 }
 
@@ -26,7 +29,31 @@ data "aws_subnet" "my-subnet-2" {
 data "aws_subnet" "my-subnet-3" {
   filter {
     name = "subnet-id"
-    values = ["subnet-03eeb73542ce1ac39"]
+    values = ["subnet-028e038513b3eacaa"]
+  }
+}
+
+# Імпортуємо subnet, знаходячи її на aws по id
+data "aws_subnet" "my-subnet-4" {
+  filter {
+    name = "subnet-id"
+    values = ["subnet-0f4e327fe37469d32"]
+  }
+}
+
+# Імпортуємо subnet, знаходячи її на aws по id
+data "aws_subnet" "my-subnet-5" {
+  filter {
+    name = "subnet-id"
+    values = ["subnet-0924f0624c03a340a"]
+  }
+}
+
+# Імпортуємо subnet, знаходячи її на aws по id
+data "aws_subnet" "my-subnet-6" {
+  filter {
+    name = "subnet-id"
+    values = ["subnet-0659fa44af1a31fbc"]
   }
 }
 
