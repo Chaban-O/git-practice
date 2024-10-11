@@ -17,29 +17,32 @@ resource "aws_lb" "application-lb" {
 
 #Створюємо таргет груп для маршутизації трафіку
 resource "aws_lb_target_group" "target-group" {
-    health_check {
-        interval            = 10
-        path                = "/"
-        protocol            = var.target_group_protocol
-        timeout             = 5
-        healthy_threshold   = 5
-        unhealthy_threshold = 2
-    }
     name        = var.target_group_name
     port        = var.health_check_port
     protocol    = var.target_group_protocol
     target_type = "instance"
     vpc_id      = var.vpc_id
+
+
+    health_check {
+        interval            = 10
+        path                = "/"
+        protocol            = var.target_group_protocol
+        port                = var.health_check_port
+        timeout             = 8
+        healthy_threshold   = 5
+        unhealthy_threshold = 2
+    }
 }
 
 # Створення ліснера на 80 для перенаправлення вхідного трафіку від ALB до цільової групи
 resource "aws_lb_listener" "alb-listener" {
     load_balancer_arn = aws_lb.application-lb.arn
-    port = 80
-    protocol = "HTTP"
+    port              = 80
+    protocol          = "HTTP"
     default_action {
         target_group_arn = aws_lb_target_group.target-group.arn
-        type = "forward"
+        type             = "forward"
     }
 }
 

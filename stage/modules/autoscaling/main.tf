@@ -26,7 +26,7 @@ resource "aws_autoscaling_group" "asg" {
   max_size            = var.max_size
   min_size            = var.min_size
   target_group_arns   = [var.aws_lb_target_group_arn]
-
+  termination_policies = ["OldestInstance"]
   health_check_type         = "ELB"
   health_check_grace_period = 300
 
