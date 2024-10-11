@@ -40,3 +40,8 @@ variable "aws_lb_target_group_arn" {
   description = "(Amazon Resource Name) групи цілей для балансувальника навантаження (Load Balancer) в AWS"
   type        = string
 }
+
+variable "ssh_public_key_name" {
+  description = "Public ssh key"
+  type        = string
+}

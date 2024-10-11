@@ -2,6 +2,7 @@ resource "aws_launch_template" "app_template" {
   name_prefix   = "my-app-template"
   image_id      = var.ami_id
   instance_type = var.instance_type
+  key_name = var.ssh_public_key_name
 
   network_interfaces {
     associate_public_ip_address = true
