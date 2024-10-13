@@ -1,6 +1,6 @@
 # Вказуємо провайдер і регіон AWS
 provider "aws" {
-  region = var.aws_region
+  region = "us-east-1"
 }
 
 # Додаємо ваш SSH ключ
@@ -12,7 +12,7 @@ resource "aws_key_pair" "deployer" {
 # Виклик модуля secrets
 module "secrets" {
   source = "./modules/secrets"
-  secret_name = "my-test-secret-key-v9"
+  secret_name = "my-test-secret-key-v53"
   password_length = 16
   recovery_window_in_days = 7
 }
@@ -31,7 +31,7 @@ module "iam_role" {
 # Виклик EC2 модуля
 module "ec2_instance" {
   source = "./modules/ec2-instance"
-  ami = local.ami_name
+  ami = data.aws_ami.my_packer_ami.id
   instance_type = "t2.micro"
   instance_name = "MyTerraformInstance"
   ebs_size = 10
@@ -42,5 +42,57 @@ module "ec2_instance" {
   aws_region = var.aws_region
 }
 
-# Отримуємо поточну інформацію про аккаунт AWS, account id
-data "aws_caller_identity" "current" {}
+# Виклик модуля Application Load Balancer
+module "alb" {
+  source = "./modules/alb"
+  lb_name           = "test-alb"
+  security_group_ids = [module.aws_security_group.allow_ssh_http_https]
+  subnet_ids = [
+    data.aws_subnet.my-subnet-1.id,
+    data.aws_subnet.my-subnet-2.id,
+    data.aws_subnet.my-subnet-3.id,
+    data.aws_subnet.my-subnet-4.id,
+    data.aws_subnet.my-subnet-5.id,
+    data.aws_subnet.my-subnet-6.id
+  ]
+  target_group_name = "test-tg"
+  health_check_port = 80
+  vpc_id            = data.aws_vpc.default.id
+  target_group_protocol = "HTTP"
+  autoscaling_group = module.autoscaling.asg_name
+  instance_ids = module.ec2_instance.instance_ids
+}
+
+#Виклик модуля Autoscaling group
+module "autoscaling" {
+  source = "./modules/autoscaling"
+  ami_id = data.aws_ami.my_packer_ami.id
+  aws_lb_target_group_arn = module.alb.target_group_arn
+  instance_security_group = module.aws_security_group.allow_ssh_http_https
+  ssh_public_key_name = aws_key_pair.deployer.key_name
+  instance_type = "t2.micro"
+  subnets = [
+    data.aws_subnet.my-subnet-1.id,
+    data.aws_subnet.my-subnet-2.id,
+    data.aws_subnet.my-subnet-3.id,
+    data.aws_subnet.my-subnet-4.id,
+    data.aws_subnet.my-subnet-5.id,
+    data.aws_subnet.my-subnet-6.id
+  ]
+  desired_capacity = 2
+  max_size = 3
+  min_size = 1
+}
+
+#Виклик RDS модуля
+# terraform import module.rds_instance.aws_db_instance.myapp-db arn:aws:rds:us-east-1:699475951891:db:myapp-db
+module "rds_instance" {
+  source = "./modules/rds-instance"
+  allocated_storage = 20
+  db_instance_class = "db.m5d.large"
+  engine_type       = "mysql"
+  rds_db_name       = "myappdb"
+  vpc_security_group_ids = [module.aws_security_group.allow_ssh_http_https]
+  cluster_identifier = "database1"
+  engine_version = "8.0.35"
+}

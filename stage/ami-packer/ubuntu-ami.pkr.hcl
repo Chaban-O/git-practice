@@ -45,7 +45,7 @@ source "amazon-ebs" "example" {
   associate_public_ip_address = true
 
   tags = {
-    Name = "Packer-created AMI"
+    Name = "Packer-created-AMI"
   }
 
   run_tags = {
