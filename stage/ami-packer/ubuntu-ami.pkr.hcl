@@ -45,7 +45,7 @@ source "amazon-ebs" "example" {
   associate_public_ip_address = true
 
   tags = {
-    Name = "Packer-created AMI"
+    Name = "Packer-created-AMI"
   }
 
   run_tags = {
@@ -57,7 +57,7 @@ build {
   sources = ["source.amazon-ebs.example"]
 
   provisioner "file" {
-    source = "/home/chaban/PycharmProjects/git-practice/stage/scripts/install-nginx.sh"
+    source = "/home/chaban/PycharmProjects/git-practice/scripts/install-nginx.sh"
     destination = "/home/ubuntu/install-nginx.sh"
   }
 
