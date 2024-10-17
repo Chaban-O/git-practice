@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  ngix:
+    image: ngix:latest
+    container_name: ngix_service
+    restart: on-failure
+    volumes:
+      - /tmp:/var/www/dir
+    ports:
+      - "80:80"
