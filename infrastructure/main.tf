@@ -12,7 +12,7 @@ resource "aws_key_pair" "deployer" {
 # Виклик модуля secrets
 module "secrets" {
   source = "./modules/secrets"
-  secret_name = "my-test-secret-key-v53"
+  secret_name = "my-test-secret-key-v59"
   password_length = 16
   recovery_window_in_days = 7
 }
@@ -89,7 +89,7 @@ module "autoscaling" {
 module "rds_instance" {
   source = "./modules/rds-instance"
   allocated_storage = 20
-  db_instance_class = "db.m5d.large"
+  db_instance_class = "db.t4g.micro"
   engine_type       = "mysql"
   rds_db_name       = "myappdb"
   vpc_security_group_ids = [module.aws_security_group.allow_ssh_http_https]

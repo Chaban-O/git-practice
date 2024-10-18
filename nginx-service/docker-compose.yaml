@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx_service
+    restart: on-failure
+    volumes:
+      - /tmp:/var/www/dir
+    ports:
+      - "80:80"
