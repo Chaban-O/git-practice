@@ -36,3 +36,32 @@ resource "aws_autoscaling_group" "asg" {
     value               = "my-app-instance"
   }
 }
+
+# Конфігурація керування планового масштабування
+resource "aws_autoscaling_schedule" "scale-up" {
+  autoscaling_group_name = aws_autoscaling_group.asg.name
+  scheduled_action_name  = "scale-up-time"
+  time_zone = "Europe/Kyiv"
+  recurrence = "25 23 * * *"
+  min_size = 1
+  desired_capacity = 3
+  max_size = 4
+}
+
+resource "aws_autoscaling_schedule" "scale-down" {
+  autoscaling_group_name = aws_autoscaling_group.asg.name
+  scheduled_action_name  = "scale-down-time"
+  time_zone = "Europe/Kyiv"
+  recurrence = "35 23 * * *"
+  min_size = 1
+  desired_capacity = 2
+  max_size = 3
+}
+
+# * * * * *
+# | | | | |
+# | | | | +----- День тижня (0 - 7) (неділя - 0 або 7)
+# | | | +------- Місяць (1 - 12)
+# | | +--------- День місяця (1 - 31)
+# | +----------- Година (0 - 23)
+# +------------- Хвилина (0 - 59)
