@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api-app-pod
+  labels:
+    app: api-app
+spec:
+  containers:
+  - name: api-app-container
+    image: api-app:latest
+    imagePullPolicy: Never
+    ports:
+    - containerPort: 5000
