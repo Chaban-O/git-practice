@@ -61,10 +61,17 @@ build {
     destination = "/home/ubuntu/install-nginx.sh"
   }
 
+  provisioner "file" {
+    source = "/home/chaban/PycharmProjects/git-practice/scripts/install_docker_package.sh"
+    destination = "/home/ubuntu/install_docker_package.sh"
+  }
+
   provisioner "shell" {
     inline = [
       "chmod +x /home/ubuntu/install-nginx.sh",
-      "bash /home/ubuntu/install-nginx.sh"
+      "bash /home/ubuntu/install-nginx.sh",
+      "chmod +x /home/ubuntu/install_docker_package.sh",
+      "bash /home/ubuntu/install_docker_package.sh"
     ]
   }
 }
