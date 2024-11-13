@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: dev
+  labels:
+    app: backend
+spec:
+  replicas: 2 # Counts of pods
+  selector: # Визначає, які поди належать до цього Deployment
+    matchLabels:
+      app: backend
+  template: # Встановлює мітки для нових подів, які будуть створені за цим шаблоном
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: api-app-container
+        image: api-app:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
