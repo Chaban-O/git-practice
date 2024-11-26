@@ -1,0 +1,12 @@
+namespace: prod
+deploymentName: backend-prod
+replicas: 3
+labels:
+  app: backend-prod
+image:
+  repository: api-app
+  tag: latest
+  pullPolicy: Never
+service:
+  port: 5000
+  nodePort: 30003
