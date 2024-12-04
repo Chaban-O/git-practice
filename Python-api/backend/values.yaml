@@ -1,0 +1,16 @@
+# values.yaml - значення за замовчуванням для чарту
+namespace: default
+deploymentName: backend
+replicas: 1
+image:
+  repository: api-app
+  tag: latest
+  pullPolicy: Always
+serviceAccount:
+  create: false
+ingress:
+  enabled: false
+autoscaling:
+  enabled: false
+service:
+  type: NodePort

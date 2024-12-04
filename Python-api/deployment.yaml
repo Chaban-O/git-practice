@@ -6,11 +6,14 @@ metadata:
   labels:
     app: backend
 spec:
-  replicas: 2 # Counts of pods
-  selector: # Визначає, які поди належать до цього Deployment
+  replicas: 1
+  # Counts of pods
+  selector:
+    # Визначає, які поди належать до цього Deployment
     matchLabels:
       app: backend
-  template: # Встановлює мітки для нових подів, які будуть створені за цим шаблоном
+  template:
+    # Встановлює мітки для нових подів, які будуть створені за цим шаблоном
     metadata:
       labels:
         app: backend
@@ -19,5 +22,27 @@ spec:
       - name: api-app-container
         image: api-app:latest
         imagePullPolicy: Never
+        # Ніколи не завантажує образ з реєстру
         ports:
         - containerPort: 5000
+        resources:
+          requests:
+            memory: "40Mi"
+            # Мінімально запитувана пам'ять
+            cpu: "250m"
+            # Мінімально запитувана CPU
+          limits:
+            memory: "40Mi"
+            # Ліміт пам'яті
+            cpu: "1"
+            # Ліміт CPU
+      - name: busybox-container
+        image: busybox
+        command: ["/bin/sh", "-c", "while true; do python3 -c 'a=[]; [a.append(\"x\"*1024*1024) for i in range(612)]; import time; time.sleep(10)'; done"]
+        resources:
+          requests:
+            memory: "20Mi"
+            cpu: "100m"
+          limits:
+            memory: "20Mi"
+            cpu: "200m"

@@ -1,0 +1,12 @@
+namespace: stage
+deploymentName: backend-stage
+replicas: 2
+labels:
+  app: backend-stage
+image:
+  repository: api-app
+  tag: latest
+  pullPolicy: Never
+service:
+  port: 5000
+  nodePort: 30002
